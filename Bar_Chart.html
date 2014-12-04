@@ -66,7 +66,7 @@ var delayData_0 = [];
 var dynamicYValue = true;
 
 d3.csv("data/2011-2013_Median_Summary_Rounded.csv", function(error, data) {
-  delayData_0 = d3.nest().key(function(d) { return d.AIRPORT;}).key(function(d) { return d.YEAR;}).key(function(d) { return d.MONTH;}).entries(data);
+  delayData_0 = d3.nest().key(function(d) { return d.AIRPORT;}).sortKeys(d3.ascending).key(function(d) { return d.YEAR;}).key(function(d) { return d.MONTH;}).entries(data);
 
   var selectAirport = d3.select("#airportCode").append("select").attr("id", "airport-list");
 
