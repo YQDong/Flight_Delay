@@ -44,7 +44,11 @@ label.dropdownLabel{
   <div id = "month" class = "dropdownMenu" style="display: table-cell;left: 60px; width: 100px; top: 20px; position:relative;">
     <label for="month" class="dropdownLabel">Month: </label>
   </div>
-  
+
+  <div class = "dropdownMenu" style="display: table-cell; left: 50px; width: 150px; top: 20px; position:relative;">
+    <button id="updateY"  style="left:50px; position:relative;" onclick="getDynamicY()">Uniform Y Scale</button>
+  </div>  
+
   <div class = "dropdownMenu" style="display: table-cell; left: 50px; width: 150px; top: 20px; position:relative;">
     <button id="update"  style="left:50px; position:relative;" onclick="updateClicked()">Update</button>
   </div>
@@ -59,6 +63,7 @@ label.dropdownLabel{
 <script>
 
 var delayData_0 = [];
+var dynamicYValue = true;
 
 d3.csv("data/2011-2013_Median_Summary_Rounded.csv", function(error, data) {
   delayData_0 = d3.nest().key(function(d) { return d.AIRPORT;}).key(function(d) { return d.YEAR;}).key(function(d) { return d.MONTH;}).entries(data);
@@ -109,6 +114,11 @@ function getFilteredData(airportName,yearNumber,monthNumber,data) {
   var filteredData_airport = data.filter(function(d){if(d["key"] == airportName){return d;}})
   var filteredData = filteredData_airport[0].values[yearNumber - 2011].values[monthNumber - 1].values;
   return filteredData;
+};
+
+function getDynamicY(){
+  dynamicYValue = !dynamicYValue;
+  updateClicked();
 };
 
 function getAirport(){
@@ -200,8 +210,10 @@ var innerColumns = {
 
   x0.domain(filteredData.map(function(d){return d.DAY_OF_MONTH;}));
   x1.domain(d3.keys(innerColumns)).rangeRoundBands([0, x0.rangeBand()]);
-  y.domain([0, d3.max(filteredData, function(d) { return d.total; })]);
-
+  if (dynamicYValue){
+  y.domain([0, d3.max(filteredData, function(d) { return d.total; })]);}else{
+  y.domain([0, 65000]);};
+  
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
@@ -296,8 +308,11 @@ var  maxDepDelay = d3.max(filteredData, function(d) { return +d.DEP_DELAY_STRENG
   });
 
   x.domain(filteredData.map(function(d) { return d.DAY_OF_MONTH; }));
-  y.domain([0, Math.max(d3.max(filteredData, function(d) { return d.total; }), maxDepDelay)]);
-
+  
+  if (dynamicYValue){
+	y.domain([0, Math.max(d3.max(filteredData, function(d) { return d.total; }), maxDepDelay)]);}else{
+	y.domain([0, 65000]);};
+	
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0,0)")
